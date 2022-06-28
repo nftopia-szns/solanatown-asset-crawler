@@ -28,8 +28,8 @@ export async function createAssetComponent(components: {
   const refreshInterval = await config.requireNumber('REFRESH_INTERVAL') * 1000
 
   // init moralis
-  const serverUrl = "https://yd9zqpf3zlup.usemoralis.com:2053/server"
-  const masterKey = "LqpYF3r7GE38LinFYJyYJAGVUQ7OtI4pcXeZoi2u";
+  const serverUrl = await config.requireString("MORALIS_SERVER_URL")
+  const masterKey = await config.requireString("MORALIS_MASTER_KEY")
   await Moralis.start({ serverUrl, masterKey });
   const solanaAPI = Moralis.SolanaAPI
 
