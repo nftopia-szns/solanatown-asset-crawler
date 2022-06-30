@@ -20,13 +20,6 @@ export async function createAssetComponent(components: {
 }): Promise<IAssetComponent & IBaseComponent & IStatusCheckCapableComponent> {
   const { config, database, elasticsearch } = components
 
-  // config
-
-  const url = await config.requireString('API_URL')
-  const batchSize = await config.requireNumber('API_BATCH_SIZE')
-  const concurrency = await config.requireNumber('API_CONCURRENCY')
-  const refreshInterval = await config.requireNumber('REFRESH_INTERVAL') * 1000
-
   // init moralis
   const serverUrl = await config.requireString("MORALIS_SERVER_URL")
   const masterKey = await config.requireString("MORALIS_MASTER_KEY")
