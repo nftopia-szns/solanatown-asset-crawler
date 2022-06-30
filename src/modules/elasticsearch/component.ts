@@ -146,10 +146,10 @@ function parseAttributes(_attributes: Attribute[]): object {
     for (const attr of _attributes) {
         switch (attr.trait_type) {
             case "X":
-                attributesElasticsearch["x"] = attr.value
+                attributesElasticsearch["x"] = Number(attr.value)
                 break;
             case "Y":
-                attributesElasticsearch["y"] = attr.value
+                attributesElasticsearch["y"] = Number(attr.value)
                 break;
             case "Type":
                 attributesElasticsearch["type"] = (attr.value as string).toLowerCase()
