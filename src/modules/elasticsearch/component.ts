@@ -2,7 +2,9 @@ import { IBaseComponent, IConfigComponent } from "@well-known-components/interfa
 import { Attribute, IElasticsearchComponent, SolanaTownPropertyElasticsearch } from "./types";
 import { Client } from '@elastic/elasticsearch'
 import { ParcelFragment } from "../asset/types";
-import fetch from 'node-fetch'
+import { ChainId, SolanaNetwork } from "nftopia-shared/dist/shared/network"
+import { SolanaTownAssetAttributes, SolanaTownAssetDto, SolanaTownAssetType } from "nftopia-shared/dist/shared/asset"
+import { MetaversePlatform } from "nftopia-shared/dist/shared/platform/types";
 
 export async function createElasticsearchComponent(components: {
     config: IConfigComponent,
@@ -43,11 +45,11 @@ export async function createElasticsearchComponent(components: {
     }
 
     // get config of blockchain network, chain id and contract addresses
-    const bcNetwork = await config.requireString('BLOCKCHAIN_NETWORK')
-    const bcChainId = await config.requireNumber('BLOCKCHAIN_CHAIN_ID')
+    const bcChainId = (await config.requireString('BLOCKCHAIN_CHAIN_ID')) as ChainId
+    const bcNetwork = (await config.requireString('BLOCKCHAIN_NETWORK')) as SolanaNetwork
 
     // check and init mappings
-    const PROPERTY_INDEX_NAME = `solanatown-${bcNetwork}-${bcChainId}`
+    const PROPERTY_INDEX_NAME = `${MetaversePlatform.SolanaTown}-${bcChainId}-${bcNetwork}`
     const isPropertyIndexExisted = await client.indices.exists({ index: PROPERTY_INDEX_NAME })
     if (!isPropertyIndexExisted) {
         console.log('property index unexisted, create new');
@@ -55,19 +57,24 @@ export async function createElasticsearchComponent(components: {
             index: PROPERTY_INDEX_NAME,
             mappings: {
                 properties: {
-                    "id": {
-                        "type": "keyword",
-                    },
-                    "owner": {
-                        "type": "keyword",
+                    // base asset dto
+                    "platform": {
+                        "type": "keyword"
                     },
                     "network": {
                         "type": "keyword",
                         "index": false,
                     },
                     "chain_id": {
-                        "type": "integer",
+                        "type": "keyword",
                         "index": false,
+                    },
+                    "contract_address": {
+                        "type": "text",
+                        "index": false
+                    },
+                    "id": {
+                        "type": "keyword",
                     },
                     "name": {
                         "type": "text",
@@ -77,6 +84,9 @@ export async function createElasticsearchComponent(components: {
                         "type": "text",
                         "analyzer": "standard"
                     },
+                    "owner": {
+                        "type": "keyword",
+                    },
                     "image": {
                         "type": "text",
                         "index": false,
@@ -85,6 +95,7 @@ export async function createElasticsearchComponent(components: {
                         "type": "text",
                         "index": false,
                     },
+                    // attributes
                     "attributes.x": {
                         "type": "integer",
                     },
@@ -104,22 +115,35 @@ export async function createElasticsearchComponent(components: {
     const bulkInsertParcels = async (_landTokens: ParcelFragment[]) => {
         if (_landTokens.length === 0) return
 
-        let dataset: SolanaTownPropertyElasticsearch[] = []
+        let dataset: SolanaTownAssetDto[] = []
         for (const _landToken of _landTokens) {
-            let landToken = new SolanaTownPropertyElasticsearch()
-            landToken.id = _landToken.id
-            // landToken.owner = _landToken.owner.id
-            landToken.network = bcNetwork
-            landToken.chain_id = bcChainId
+            let name = ""
+            let description = ""
+            let image = ""
+            let external_url = ""
+            let attributes = {}
 
             if (_landToken.tokenURIContent && Object.keys(_landToken.tokenURIContent).length > 0) {
-                landToken.name = _landToken.tokenURIContent.name
-                landToken.description = _landToken.tokenURIContent.description
-                landToken.image = _landToken.tokenURIContent.image
-                landToken.external_url = _landToken.tokenURIContent.external_url
+                name = _landToken.tokenURIContent.name
+                description = _landToken.tokenURIContent.description
+                image = _landToken.tokenURIContent.image
+                external_url = _landToken.tokenURIContent.external_url
 
-                const attributes = _landToken.tokenURIContent.attributes
-                landToken.attributes = parseAttributes(attributes)
+                attributes = parseAttributes(_landToken.tokenURIContent.attributes)
+            }
+
+            let landToken: SolanaTownAssetDto = {
+                platform: MetaversePlatform.SolanaTown,
+                network: bcNetwork,
+                chain_id: bcChainId,
+                contract_address: 'emptyyyy', // TODO: what should I place?
+                id: _landToken.id,
+                name: name,
+                description: description,
+                owner: _landToken.owner?.id || "",
+                image: image,
+                external_url: external_url,
+                attributes: attributes as SolanaTownAssetAttributes
             }
 
             dataset.push(landToken)
