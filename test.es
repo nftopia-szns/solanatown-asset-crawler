@@ -1,11 +1,11 @@
 
 GET _cat/indices
 
-GET /solanatown-solana-1/_search
+GET /solanatown-solana-mainnet/_search
 {
     "query": {
         "match_all": {}
     }
 }
 
-DELETE /sandbox-ethereum-1
+DELETE /solanatown-solana-mainnet

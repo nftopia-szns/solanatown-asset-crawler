@@ -6,19 +6,6 @@ export interface IElasticsearchComponent {
     bulkInsertParcels: (_landTokens: ParcelFragment[]) => Promise<void>,
 }
 
-export class SolanaTownPropertyElasticsearch {
-    id: string
-    owner: string
-    network: string
-    chain_id: number
-    contract_address: string
-    name: string
-    description: string
-    image: string
-    external_url: string
-    attributes: object
-}
-
 export type ParcelURIFormat = {
     name: string
     description: string

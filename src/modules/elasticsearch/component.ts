@@ -1,9 +1,9 @@
 import { IBaseComponent, IConfigComponent } from "@well-known-components/interfaces";
-import { Attribute, IElasticsearchComponent, SolanaTownPropertyElasticsearch } from "./types";
+import { Attribute, IElasticsearchComponent } from "./types";
 import { Client } from '@elastic/elasticsearch'
 import { ParcelFragment } from "../asset/types";
 import { ChainId, SolanaNetwork } from "nftopia-shared/dist/shared/network"
-import { SolanaTownAssetAttributes, SolanaTownAssetDto, SolanaTownAssetType } from "nftopia-shared/dist/shared/asset"
+import { SolanaTownAssetAttributes, SolanaTownAssetDto } from "nftopia-shared/dist/shared/asset"
 import { MetaversePlatform } from "nftopia-shared/dist/shared/platform/types";
 
 export async function createElasticsearchComponent(components: {
