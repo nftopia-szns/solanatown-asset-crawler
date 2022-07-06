@@ -49,7 +49,7 @@ export async function createElasticsearchComponent(components: {
     const bcChainId = (await config.requireString('BLOCKCHAIN_CHAIN_ID')) as SolanaChainId
 
     // check and init mappings
-    const PROPERTY_INDEX_NAME = `${MetaversePlatform.SolanaTown}-${bcChainId}-${bcNetwork}`
+    const PROPERTY_INDEX_NAME = `${MetaversePlatform.SolanaTown}-${bcNetwork}-${bcChainId}`
     const isPropertyIndexExisted = await client.indices.exists({ index: PROPERTY_INDEX_NAME })
     if (!isPropertyIndexExisted) {
         console.log('property index unexisted, create new');
